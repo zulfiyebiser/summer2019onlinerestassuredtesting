@@ -232,6 +232,7 @@ public class ORDSTestsDay4 {
         // message is not mandotary only for helping to understand
 
     }
+
     /** ####TASK#####
      *  Given accept type as JSON
      *  And path parameter is id with value 2900
@@ -243,6 +244,51 @@ public class ORDSTestsDay4 {
      *
      */
 
+    /**
+     *     "location_id": 2900,
+     *     "street_address": "20 Rue des Corps-Saints",
+     *     "postal_code": "1730",
+     *     "city": "Geneva",
+     *     "state_province": "Geneve",
+     *     "country_id": "CH",
+     */
+    @Test
+    @DisplayName("Verify that JSON body has following entries")
+    public void test9(){
+        given().
+                accept(ContentType.JSON).
+                pathParam("id", 2900).
+                when().
+                get("/locations/{id}").
+                then().
+                assertThat().
+                statusCode(200).
+                body("", hasEntry("street_address", "20 Rue des Corps-Saints")).
+                body("", hasEntry("city", "Geneva")).
+                body("", hasEntry("postal_code", "1730")).
+                body("", hasEntry("country_id", "CH")).
+                body("", hasEntry("state_province", "Geneve")).
+                log().all(true);
 
     }
 
+    @Test
+    @DisplayName("Verify that JSON body has following entries")
+    public void test9_2(){
+        given().
+                accept(ContentType.JSON).
+                pathParam("id", 2900).
+                when().
+                get("/locations/{id}").
+                then().
+                assertThat().
+                statusCode(200).
+                body("street_address", is("20 Rue des Corps-Saints")).
+                body("city", is("Geneva")).
+                body("postal_code", is("1730")).
+                body("country_id", is("CH")).
+                body("state_province", is("Geneve")).
+                log().all(true);
+    }
+
+}
