@@ -38,12 +38,10 @@ public class ORDSTestsDay4 {
     public void test1() {
         given().
                 accept(ContentType.JSON).
-                when().
+         when().
                 get("/employees").
-                then().
-                assertThat().
-                statusCode(200).
-                contentType(ContentType.JSON).
+         then().
+                assertThat().statusCode(200).
                 time(lessThan(3L), TimeUnit.SECONDS).
                 log().all(true);//payload=body, and our body has JSON format
 
@@ -89,7 +87,7 @@ public class ORDSTestsDay4 {
         List<?> links = jsonPath.getList("links.href");
         List<?> links1 = jsonPath.getList("items.region_id");
         List<?> links2 = jsonPath.getList("items.links.href");
-        //System.out.println(links);
+        System.out.println(links1);
         for (Object link : links) {
             System.out.println(link);
         }
@@ -164,9 +162,9 @@ public class ORDSTestsDay4 {
     public void test6() {
         given().
                 accept(ContentType.JSON).
-                when().
+        when().
                 get("/employees").
-                then().
+        then().
                 assertThat().
                 statusCode(200).
                 body("items.salary", everyItem(greaterThan(0)));
@@ -213,7 +211,8 @@ public class ORDSTestsDay4 {
      */
     @Test
     @DisplayName("verify that body returns following salary information after sorting from higher to lower(after sorting it in descending order")
-    public void test8(){ List<Integer> expectedSalaries = List.of(24000, 17000, 17000, 12008, 11000,
+    public void test8(){
+        List<Integer> expectedSalaries = List.of(24000, 17000, 17000, 12008, 11000,
             9000, 9000, 8200, 8200, 8000,
             7900, 7800, 7700, 6900, 6500,
             6000, 5800, 4800, 4800, 4200,
@@ -258,12 +257,12 @@ public class ORDSTestsDay4 {
         given().
                 accept(ContentType.JSON).
                 pathParam("id", 2900).
-                when().
+        when().
                 get("/locations/{id}").
-                then().
+         then().
                 assertThat().
                 statusCode(200).
-                body("", hasEntry("street_address", "20 Rue des Corps-Saints")).
+                body("", hasEntry("street_address", "20 Rue des Corps-Saints")). //--> key and value
                 body("", hasEntry("city", "Geneva")).
                 body("", hasEntry("postal_code", "1730")).
                 body("", hasEntry("country_id", "CH")).
@@ -271,7 +270,7 @@ public class ORDSTestsDay4 {
                 log().all(true);
 
     }
-
+        // easier way!!!!
     @Test
     @DisplayName("Verify that JSON body has following entries")
     public void test9_2(){

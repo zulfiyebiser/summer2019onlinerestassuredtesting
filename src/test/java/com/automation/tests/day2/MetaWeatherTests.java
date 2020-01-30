@@ -29,23 +29,23 @@ public class MetaWeatherTests {
     public void test1() {
         Response response = given()
                 .baseUri(baseURI + "location/search/")
-                .queryParam("query", "New")
+                .queryParam("query", "Ank")
                 .get();
         assertEquals(200, response.getStatusCode());
-        System.out.println(response.prettyPrint());
+       response.prettyPrint();
 
     }
 
     // /users/100/ - 100 it's a path parameter
     // /users/255/ - 155 it's a path parameter
     // /users/255?name=James | name - query parameter key=value , key it's a query parameter
-    //        "woeid": 2514815,
+    //        "woeid": 2514815, this woeid stands for location(Earth ID) we can get weather from any place
     @Test
     public void test2() {
         Response response = given()
                 .pathParam("woeid", "2458833")
                 .get(baseURI + "location/{woeid}");
-        System.out.println(response.prettyPrint());
+       response.prettyPrint();
 
     }
 }

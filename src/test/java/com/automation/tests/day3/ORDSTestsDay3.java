@@ -33,9 +33,10 @@ public class ORDSTestsDay3 {
         given().
                 accept("application/json").
                 get("/employees").
-                then().
+        then().
                 assertThat().statusCode(200).
-                and().assertThat().contentType("application/json").
+        and().
+                assertThat().contentType("application/json").
                 log().all(true);
     }
 
@@ -48,14 +49,17 @@ public class ORDSTestsDay3 {
         given().
                 accept("application/json").
                 pathParam("id", 100).
-                when().get("/employees/{id}").
-                then().assertThat().statusCode(200).
-                and().assertThat().body("employee_id", is(100),
+        when().
+                get("/employees/{id}").
+        then().
+                assertThat().statusCode(200).
+        and().
+                assertThat().body("employee_id", is(100),
                 "department_id", is(90),
                 "last_name", is("King")).
                 log().all(true);
         //body ("phone_number") --> 515.123.4567
-        //is is coming from ---> import static org.hamcrest.Matchers.*;
+        //is  is short cut assertion is coming from ---> import static org.hamcrest.Matchers.*;
         //log().all  Logs everything in the response, including e.g. headers,
         // cookies, body with the option to pretty-print the body if the content-type is
     }
@@ -84,31 +88,38 @@ public class ORDSTestsDay3 {
         //verify that response time is less than 10 seconds
     }
 
+
+    // how to get specific object from somewhere
+    //how to get specific employee from employee table
     @Test
     public void test4() {
         JsonPath json = given().
                 accept("application/json").
                 when().
                 get("/employees").
-                thenReturn().jsonPath();
+                thenReturn().jsonPath();//--> jsonPath() returns to json path object
 
         //items[employee1, employee2, employee3] | items[0] = employee1.first_name = Steven
 
         String nameOfFirstEmployee = json.getString("items[0].first_name");
-        String nameOfLastEmployee = json.getString("items[-1].first_name"); //-1 - last index
+        String nameOfLastEmployee = json.getString("items[-1].first_name"); //-1 - last index its a groovy syntex
 
         System.out.println("First employee name: " + nameOfFirstEmployee);
         System.out.println("Last employee name: " + nameOfLastEmployee);
         //in JSON, employee looks like object that consists of params and their values
         //we can parse that json object and store in the map.
-        Map<String, ?> firstEmployee = json.get("items[0]"); // we put ? because it can be also not String
+        Map<String, ?> firstEmployee = json.get("items[0]"); // we put ? because it can including  some value that are not String
         System.out.println(firstEmployee);
 
         //since firstEmployee it's a map (key-value pair, we can iterate through it by using Entry. entry represent one key=value pair)
         // put ? as a value (Map<String, ?>), because there are values of different data type: string, integer, etc..
         //if you put String as value, you might get some casting exception that cannot convert from integer(or something else) to string
         for (Map.Entry<String, ?> entry : firstEmployee.entrySet()) {
-            System.out.println("key: " + entry.getKey() + ", value: " + entry.getValue());
+            //System.out.println("key: " + entry.getKey() + ", value: " + entry.getValue());
+            System.out.println(entry.getKey()+": "+entry.getValue());
+        }
+        for (Map.Entry<String, ?> entry : firstEmployee.entrySet()) {
+            System.out.println(entry.getKey()+": "+entry.getValue());
         }
 //       get and print all last names
 //        items it's an object. whenever you need to read some property from the object, you put object.property
@@ -116,6 +127,10 @@ public class ORDSTestsDay3 {
         List<String> lastNames = json.get("items.last_name");
         for (String str : lastNames) {
             System.out.println("last name: " + str);
+        }
+        List<String > firstNames = json.get("items.first_name");
+        for(String first: firstNames){
+            System.out.println("first name: "+first);
         }
 
     }
@@ -129,17 +144,17 @@ public class ORDSTestsDay3 {
         JsonPath json = given().
                 accept("application/json").
                 when().
-                get("/countries").prettyPeek().jsonPath(); // exclude .prettyPeek() and you will not see detailed info about response
-
-        List<HashMap<String, ?>> allCountries = json.get("items");
+               get("/countries").prettyPeek().jsonPath(); // exclude .prettyPeek() and you will not see detailed info about response
+        List<Map<String, ?>> allCountries = json.get("items");
 
         System.out.println(allCountries);
         // when we read data from json response, values are not only strings
         //so if we are not sure that all values will have same data type
         //we can put ?
-        for (HashMap<String, ?> map : allCountries) {
+        for (Map<String, ?> map : allCountries) {
             System.out.println(map);
         }
+        // we can do also with HashMap
     }
 
     // get collection of employee's salaries
@@ -152,8 +167,10 @@ public class ORDSTestsDay3 {
                 when().
                 get("/employees").
                 thenReturn().jsonPath().get("items.salary");
-        Collections.sort(salaries);//sort from a to z, 0-9
-        Collections.reverse(salaries);
+
+//        Collections.sort(salaries);//sort from a to z, 0-9
+//        Collections.reverse(salaries);
+        Collections.sort(salaries,Collections.reverseOrder());//--> two line together
         System.out.println(salaries);
     }
 
@@ -170,7 +187,7 @@ public class ORDSTestsDay3 {
 //        Replaces each element of this list with the result of applying the operator to that element.
 //        replace '.' with '-' in every value
         phoneNumbers.replaceAll(phone -> phone.toString().replace(".", "-"));
-
+        // phone is a temporary variable
         System.out.println(phoneNumbers);
     }
 
@@ -189,18 +206,22 @@ public class ORDSTestsDay3 {
     @Test
     public void test8(){
         Response response = given().
-                accept(ContentType.JSON).
+                accept(ContentType.JSON).// instead of accept("application/json").
                 pathParam("id", 1700).
                 when().
                 get("/locations/{id}");
 
         response.
                 then().
-                assertThat().body("location_id", is(1700)).
-                assertThat().body("postal_code", is("98199")).
-                assertThat().body("city", is("Seattle")).
-                assertThat().body("state_province", is("Washington")).
+                assertThat().body("location_id",
+                is(1700),"postal_code",
+                is("98199"),"city", is("Seattle"),"state_province",
+                is("Washington")).
+                //assertThat().body("postal_code", is("98199")).
+                //assertThat().body("city", is("Seattle")).
+               // assertThat().body("state_province", is("Washington")). we can write separately or together
                 log().body();
+
 
     }
 

@@ -23,7 +23,7 @@ public class ORDSTests {
     //   /ords/hr or //ords/hr/employees - same for all
     private String baseURI = "http://ec2-34-201-69-55.compute-1.amazonaws.com:1000/ords/hr";
 
-    //we start from given()
+    //we start from given() it comes from RestAssured class
     //then we can specify type of request like: get(), put(), delete(), post()
     //and as parameter, we enter resource location (URI)
     //then we are getting response back. that response we can put into Response object
@@ -38,7 +38,7 @@ public class ORDSTests {
 
         assertEquals(200, response.getStatusCode());
 
-        System.out.println(response.prettyPrint());
+       response.prettyPrint();
     }
 
     //#TASK: get employee with id 100 and verify that response returns status code 200
@@ -51,14 +51,14 @@ public class ORDSTests {
         //because web service can return let's say json or xml
         //when we put header info "Accept", "application/json", we are saying that we need only json as response
         Response response = given().
-                header("accept", "application/json").
+                header("accept", "application/json").// doesn't make any differences it works without this line
                 get(baseURI + "/employees/100");
         int actualStatusCode = response.getStatusCode();
-        System.out.println(response.prettyPrint());
+        response.prettyPrint();
         assertEquals(200, actualStatusCode);
 
         //get information about response content type, you can retrieve from response object
-        System.out.println("What kind of content server sends to you, in this response: "+response.getHeader("Content-Type"));
+        System.out.println("What kind of content server sends to you, in this response: "+response.getContentType());
     }
 
     //    #Task: perform GET request to /regions, print body and all headers.
@@ -67,12 +67,13 @@ public class ORDSTests {
         Response response = given().get(baseURI+"/regions");
         assertEquals(200, response.getStatusCode());
         //to get specific header
-        Header header = response.getHeaders().get("Content-Type");
+       Header header = response.getHeaders().get("Content-Type");
+
         //print all headers one by one
         for(Header h: response.getHeaders()){
             System.out.println(h);
         }
         System.out.println("##########################");
-        System.out.println(response.prettyPrint());
+        response.prettyPrint();
     }
 }

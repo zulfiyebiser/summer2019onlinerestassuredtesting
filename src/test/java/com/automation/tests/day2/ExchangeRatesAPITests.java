@@ -25,7 +25,7 @@ public class ExchangeRatesAPITests {
         //verify that content type is json
         assertEquals(200, response.getStatusCode());
         //verify that data is coming as json
-        assertEquals("application/json", response.getHeader("Content-Type"));
+       // assertEquals("application/json", response.getHeader("Content-Type"));
         //or like this
         assertEquals("application/json", response.getContentType());// looks easyer to remember
 
@@ -50,19 +50,24 @@ public class ExchangeRatesAPITests {
     //    #TASK: verify that response body, for latest currency rates, contains today's date (2020-01-23 | yyyy-MM-dd)
     @Test
     public void test4() {
-        Response response = given()
-                .baseUri(baseURI + "latest")
-                .queryParam("base", "GBP")
-                .get();
-        // to sepecify todays date
+        Response response = given().
+                baseUri(baseURI + "latest").
+                queryParam("base", "GBP").
+                get();
+
         String todaysDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         System.out.println("Today's date: " + todaysDate);
 
         assertEquals(200, response.getStatusCode());
+        System.out.println(response.getBody().asString());
         assertTrue(response.getBody().asString().contains(todaysDate));
-        response.prettyPrint();
+
     }
+
+    //let's get currency exchange rate for year 2000
+    //GET https://api.exchangeratesapi.io/history?start_at=2018-01-01&end_at=2018-09-01&base=USD&symbols=ILS,JPY
+
 
     //let's get currency exchange rate for year 2000
     //GET https://api.exchangeratesapi.io/history?start_at=2018-01-01&end_at=2018-09-01&base=USD&symbols=ILS,JPY

@@ -9,10 +9,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.*;
@@ -41,9 +38,9 @@ public class MetaWeatherJsonPathTests {
         given().
                 accept(ContentType.JSON).
                 queryParam("query", "New").
-                when().
+        when().
                 get("/search").
-                then().
+        then().
                 assertThat().
                 statusCode(200).
                 body("", hasSize(5)).
@@ -67,9 +64,9 @@ public class MetaWeatherJsonPathTests {
         given().
                 accept(ContentType.JSON).
                 queryParam("query", "New").
-                when().
+        when().
                 get("/search").
-                then().
+         then().
                 assertThat().
                 statusCode(200).
                 body("title[0]", is("New York")).
@@ -82,24 +79,24 @@ public class MetaWeatherJsonPathTests {
     @Test
     @DisplayName("Verifies that 1st city has following info:New York, City, 2459115, 40.71455,-74.007118")
     public void test2_2() {
-        Map<String,String> expected = new HashMap<>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("title", "New York");
         expected.put("location_type", "City");
         expected.put("woeid", "2459115");
         expected.put("latt_long", "40.71455,-74.007118");
 
         Response response = given().
-                accept(ContentType.JSON).
-                queryParam("query", "New").
+                    accept(ContentType.JSON).
+                    queryParam("query", "New").
                 when().
-                get("/search");
+                    get("/search");
         JsonPath jsonPath = response.jsonPath();
-        //String.class, String.class will force jsonpath to return map with String as key and value
+        //String.class, String.class will force jsonpath to return map with String as key and value first for key second for value
         assertEquals(expected, jsonPath.getMap("[0]", String.class, String.class));
         //for first title, title[0], but for first object, we can say just [0]
         //if one object is a key=value pair like map, collection of this objects can be represented as list of map
         List<Map<String, ?>> values = jsonPath.get();
-        for(Map<String, ?> value: values){
+        for (Map<String, ?> value : values) {
             System.out.println(value);
         }
     }
@@ -113,7 +110,7 @@ public class MetaWeatherJsonPathTests {
      * |  Dallas |
      * |Las Vegas|*/
     @Test
-    public void test3(){
+    public void test3() {
         given().
                 accept(ContentType.JSON).
                 queryParam("query", "Las").
@@ -123,29 +120,25 @@ public class MetaWeatherJsonPathTests {
         //hasItems - exact match
         //containsItems - partial match
     }
-
-
-}
-/**
- * <p>
- * TASK
- * Given accept type is JSON
- * When users sends a GET request to "/search"
- * And query parameter is 'Las'
- * Then user verifies that payload  contains following titles:
- * |Glasgow  |
- * |Dallas   |
- * |Las Vegas|
- * <p>
- * <p>
+/*
  * TASK
  * Given accept type is JSON
  * When users sends a GET request to "/search"
  * And query parameter is 'Las'
  * Then verify that every item in payload has location_type City
- * <p>
- * <p>
- * TASK
+ */
+    @Test
+    public void test4() {
+        given().
+                accept(ContentType.JSON).
+                queryParam("query", "Las").
+                when().
+                get("/search").
+                then().assertThat().body("location_type", everyItem(is("City"))).
+                log().all(true);
+    }
+    /*
+    TASK
  * Given accept type is JSON
  * When users sends a GET request to "/location"
  * And path parameter is '44418'
@@ -157,7 +150,28 @@ public class MetaWeatherJsonPathTests {
  * |OpenWeatherMap      |
  * |Weather Underground |
  * |World Weather Online|
- * <p>
+     */
+    @Test
+    public void test5() {
+        List<String> expected = Arrays.asList("BBC","Forecast.io","HAMweather","Met Office",
+                "OpenWeatherMap","Weather Underground",
+                "World Weather Online");
+        Response response =   given().
+                accept(ContentType.JSON).
+                pathParam("woeid", 44418).
+                when().
+                get("/location/{woeid}");
+
+        List<String> actual = response.jsonPath().getList("sources.title");
+
+        assertEquals(expected, actual);
+
+    }
+
+}
+/*
+
+
  * TASK
  * Given accept type is JSON
  * When users sends a GET request to "/search"
